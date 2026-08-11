@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rhys Lester-Talley — Systems Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14162b;          /* deep CRT navy */
+  --bg2:#1d2140;         /* raised dark panel */
+  --panel:#f3efe3;       /* warm dialogue-box paper */
+  --ink:#1a1c2c;         /* near-black ink */
+  --slate:#6b7bad;       /* muted UI text */
+  --line:#3a4079;        /* borders on dark */
+  --green:#39c46e;       /* phosphor accent (systems nod) */
+  --amber:#ffcd58;       /* selection / highlight */
+  --red:#d1425b;         /* selector arrow / alert */
+  --shadow:#0c0d1c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--bg);
+  color:var(--panel);
+  font-family:'VT323',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:22px;
+  line-height:1.15;
+  -webkit-font-smoothing:none;
+  image-rendering:pixelated;
+  display:flex;justify-content:center;
+  padding:18px;
+}
+img,svg{image-rendering:pixelated}
+
+/* subtle static scanlines */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.10) 3px 4px);
+  mix-blend-mode:multiply;
+}
+
+.frame{
+  width:100%;max-width:940px;
+  background:var(--bg2);
+  border:4px solid var(--line);
+  box-shadow:0 0 0 4px var(--shadow), 0 14px 0 4px var(--shadow);
+  display:flex;flex-direction:column;
+  min-height:min(88vh,720px);
+}
+
+/* ---- status bar ---- */
+.status{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-bottom:4px solid var(--line);
+  background:var(--bg);color:var(--slate);
+  font-size:19px;letter-spacing:.5px;
+}
+.led{width:11px;height:11px;background:var(--green);
+  box-shadow:0 0 8px var(--green);flex:0 0 auto}
+.status .who{color:var(--green)}
+.status .spacer{flex:1}
+.status .clock{color:var(--slate)}
+
+/* ---- main stage ---- */
+.stage{flex:1;padding:22px;display:flex;flex-direction:column;gap:18px}
+
+.home{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:center;flex:1}
+.title-wrap{display:flex;flex-direction:column;gap:14px}
+.name{
+  font-family:'Press Start 2P',ui-monospace,monospace;
+  font-size:clamp(20px,4.4vw,34px);
+  line-height:1.35;color:var(--panel);
+  text-shadow:3px 3px 0 var(--shadow);
+  margin:0;
+}
+.role{display:flex;align-items:center;gap:10px;color:var(--green);
+  font-size:24px;letter-spacing:1px}
+.role .prompt{color:var(--amber)}
+
+/* menu */
+.menu{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;max-width:340px}
+.menu li{display:flex;align-items:center;gap:12px;padding:9px 12px;cursor:pointer;
+  color:var(--panel);font-size:26px;letter-spacing:1px;border:3px solid transparent}
+.menu li .arrow{color:var(--red);opacity:0;transition:opacity .05s}
+.menu li .hint{margin-left:auto;color:var(--slate);font-size:18px}
+.menu li[aria-selected="true"]{background:var(--bg);border-color:var(--line)}
+.menu li[aria-selected="true"] .arrow{opacity:1}
+.menu li:hover{background:#171a35}
+.menu li:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+/* hero CRT */
+.hero{display:flex;justify-content:center;align-items:center}
+.hero svg{width:100%;max-width:320px;height:auto}
+@keyframes blink{50%{opacity:0}}
+.cursor-blink{animation:blink 1s steps(1) infinite}
+
+/* ---- content screens ---- */
+.screen{flex:1;display:none;flex-direction:column;gap:14px;overflow:auto}
+.screen.active{display:flex}
+.screen h2{
+  font-family:'Press Start 2P',monospace;font-size:16px;color:var(--amber);
+  margin:0 0 4px;letter-spacing:1px;
+}
+.screen p{margin:0 0 10px;color:var(--panel)}
+.muted{color:var(--slate)}
+.green{color:var(--green)}
+a{color:var(--amber);text-decoration:none;border-bottom:2px solid var(--amber)}
+a:hover{color:var(--panel);border-color:var(--panel)}
+
+.card{background:var(--bg);border:3px solid var(--line);padding:14px 16px}
+.card + .card{margin-top:12px}
+.card h3{margin:0 0 6px;font-size:26px;color:var(--panel);letter-spacing:.5px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.tag{font-size:16px;color:var(--green);border:2px solid var(--line);padding:2px 8px;letter-spacing:.5px}
+.kv{display:flex;gap:8px;margin:3px 0}
+.kv .k{color:var(--amber);flex:0 0 88px;font-size:19px;letter-spacing:.5px}
+.kv .v{color:var(--panel)}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:var(--ink);
+  border:none;padding:12px 20px;font-family:'VT323',monospace;font-size:24px;cursor:pointer;
+  letter-spacing:1px;text-decoration:none;border-bottom:none}
+.btn:hover{background:var(--amber)}
+.contact{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+
+/* ---- dialogue box ---- */
+.dialogue{
+  background:var(--panel);color:var(--ink);
+  border:4px solid var(--ink);
+  box-shadow:inset 0 0 0 3px var(--panel),inset 0 0 0 6px #cbc7ba;
+  padding:14px 18px;min-height:74px;display:flex;align-items:center;gap:12px;
+  font-size:24px;line-height:1.2;
+}
+.dialogue .back{cursor:pointer;color:var(--red);font-size:22px;letter-spacing:1px;
+  border:3px solid var(--ink);padding:2px 10px;background:transparent;font-family:inherit;display:none}
+.dialogue .back:hover{background:var(--ink);color:var(--panel)}
+.dialogue.showback .back{display:inline-block}
+.dialogue .tri{color:var(--red);margin-left:auto;animation:blink 1s steps(1) infinite}
+#dtext{min-height:1.2em}
+
+/* responsive */
+@media(max-width:680px){
+  body{font-size:20px;padding:8px}
+  .home{grid-template-columns:1fr;gap:14px}
+  .hero{order:-1}.hero svg{max-width:200px}
+  .menu{max-width:none}
+  .menu li{font-size:23px}
+  .status{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .cursor-blink,.dialogue .tri{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- status bar -->
+  <div class="status">
+    <span class="led" aria-hidden="true"></span>
+    <span class="who">rhys@systems</span><span>:~$</span>
+    <span class="spacer"></span>
+    <span>SYSTEM ONLINE</span>
+    <span class="clock" id="clock">--:--</span>
+  </div>
+
+  <div class="stage">
+
+    <!-- HOME -->
+    <div class="home" id="home">
+      <div class="title-wrap">
+        <h1 class="name">RHYS<br>LESTER-TALLEY</h1>
+        <div class="role"><span class="prompt">&gt;</span> os &amp; systems software engineer</div>
+        <ul class="menu" id="menu">
+          <li data-target="resume"     tabindex="0"><span class="arrow">▶</span>RESUME<span class="hint">pdf</span></li>
+          <li data-target="projects"   tabindex="0"><span class="arrow">▶</span>PROJECTS<span class="hint">2</span></li>
+          <li data-target="experience" tabindex="0"><span class="arrow">▶</span>EXPERIENCE</li>
+          <li data-target="education"  tabindex="0"><span class="arrow">▶</span>EDUCATION</li>
+          <li data-target="about"      tabindex="0"><span class="arrow">▶</span>ABOUT</li>
+        </ul>
+      </div>
+      <div class="hero" aria-hidden="true">
+        <!-- pixel CRT terminal: the signature element -->
+        <svg viewBox="0 0 64 64" shape-rendering="crispEdges" role="img" aria-label="Pixel-art CRT terminal">
+          <!-- desk -->
+          <rect x="4" y="54" width="56" height="6" fill="#2a2f5c"/>
+          <rect x="4" y="54" width="56" height="2" fill="#3a4079"/>
+          <!-- monitor body -->
+          <rect x="10" y="10" width="44" height="36" fill="#c9c5b6"/>
+          <rect x="10" y="10" width="44" height="3" fill="#e6e2d4"/>
+          <rect x="10" y="43" width="44" height="3" fill="#9a9788"/>
+          <!-- screen -->
+          <rect x="14" y="14" width="36" height="26" fill="#0f1124"/>
+          <!-- prompt lines -->
+          <rect x="17" y="18" width="3" height="3" fill="#39c46e"/>
+          <rect x="22" y="18" width="18" height="3" fill="#2f6d49"/>
+          <rect x="17" y="24" width="3" height="3" fill="#39c46e"/>
+          <rect x="22" y="24" width="12" height="3" fill="#2f6d49"/>
+          <rect x="17" y="30" width="3" height="3" fill="#39c46e"/>
+          <!-- blinking cursor -->
+          <rect x="22" y="30" width="6" height="4" fill="#39c46e" class="cursor-blink"/>
+          <!-- power led + stand -->
+          <rect x="49" y="41" width="2" height="2" fill="#39c46e"/>
+          <rect x="28" y="46" width="8" height="6" fill="#b6b3a4"/>
+          <rect x="22" y="52" width="20" height="3" fill="#9a9788"/>
+          <!-- coffee mug, for warmth -->
+          <rect x="52" y="48" width="7" height="6" fill="#d1425b"/>
+          <rect x="59" y="49" width="2" height="3" fill="#d1425b"/>
+          <rect x="53" y="46" width="4" height="2" fill="#6b7bad"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- SCREENS -->
+    <section class="screen" id="s-resume">
+      <h2>RESUME</h2>
+      <p>One click, no games. The PDF is the fastest path to the full picture.</p>
+      <p><a class="btn" href="resume.pdf" download>▼ DOWNLOAD RESUME (PDF)</a></p>
+      <p class="muted">Replace <span class="green">resume.pdf</span> with your file, or point this at a hosted copy.</p>
+    </section>
+
+    <section class="screen" id="s-projects">
+      <h2>PROJECTS</h2>
+      <p class="muted">Both are proprietary IBM z/TPF systems work, so there's no public repo — but I can walk through the design, the tradeoffs, and the gnarly parts in an interview.</p>
+
+      <div class="card">
+        <h3>Remote TLS Certificate Expiration Monitor</h3>
+        <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">x86 ASM</span><span class="tag">z/TPF</span></div>
+        <div class="kv"><span class="k">Problem</span><span class="v">Large z/TPF clients — Visa, Amtrak, the IRS — had no way to track expiry of the remote TLS certs their systems handshake with. A silent expiration means an outage.</span></div>
+        <div class="kv"><span class="k">Built</span><span class="v">Compliance tooling that captures client/server certs after the TLS handshake into a hashmap in system heap. An operator command lists every stored cert with its expiry; a daily sweep flags anything inside a configurable window and hands it to a customizable user exit so each client wires in their own alerting.</span></div>
+        <div class="kv"><span class="k">Hard part</span><span class="v">Doing this inside a proprietary OS with tight heap constraints and zero tolerance for leaks — and designing the user-exit boundary so clients extend behavior without touching core code.</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Parallel I/O &amp; Compression Migration</h3>
+        <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">TPFDF</span><span class="tag">CRUISE</span></div>
+        <div class="kv"><span class="k">Problem</span><span class="v">A hierarchical, record-oriented TPFDF database was slow to read at scale.</span></div>
+        <div class="kv"><span class="k">Built</span><span class="v">A migration routine converting it into an indexed, compressed structure — up to <span class="green">96% faster reads</span>. Reused existing CRUISE architecture and DF APIs to keep duplication down, plus a fallback path so a migration can roll back safely on live data.</span></div>
+        <div class="kv"><span class="k">Hard part</span><span class="v">Making migration safe and reversible against production data while proving the read-path win held up under real load.</span></div>
+      </div>
+    </section>
+
+    <section class="screen" id="s-experience">
+      <h2>EXPERIENCE</h2>
+      <div class="card">
+        <h3>Software Developer Intern — IBM z/TPF</h3>
+        <p class="muted">Middleware &amp; Security · Database squad — Poughkeepsie, NY · 2025–present</p>
+        <p>Built middleware TLS-cert monitoring, resolved a critical bug that hung shared system sockets, and worked directly with clients to scope and redesign features. <span class="green">Converted a full-time offer into a continued internship to pursue my MS.</span></p>
+      </div>
+      <div class="card">
+        <h3>Software Engineering Intern — Columbia Build Labs (AMLAH)</h3>
+        <p class="muted">Backend &amp; system design — New York, NY · 2024–2025</p>
+        <p>Designed data models, database schemas, and RESTful APIs for scheduling remote real-estate tours, agent availability, and inventory.</p>
+      </div>
+      <div class="card">
+        <h3>Teaching Assistant — Columbia CS</h3>
+        <p class="muted">4 courses · 3 professors — 2024–present</p>
+        <p>TA for Advanced C, C++ Design, Data Structures, and Intro Java. Build grading rubrics in Pygrader, run office hours, and design exams, assignments, and projects.</p>
+      </div>
+      <div class="card">
+        <h3>Research Intern — DitecT Lab (WayCARE)</h3>
+        <p class="muted">Prof. Xuan Di — 2024</p>
+        <p>Extended an existing codebase to deploy and update a full-stack weather-data dashboard.</p>
+      </div>
+    </section>
+
+    <section class="screen" id="s-education">
+      <h2>EDUCATION</h2>
+      <div class="card">
+        <h3>M.S. Computer Science — Software Systems</h3>
+        <p class="muted">Columbia University · expected May 2027</p>
+      </div>
+      <div class="card">
+        <h3>B.S. Computer Science — Magna Cum Laude</h3>
+        <p class="muted">Columbia University · May 2026 · GPA 4.08 / 4.00</p>
+        <p><span class="green">Tau Beta Pi</span> · <span class="green">Upsilon Pi Epsilon</span></p>
+      </div>
+    </section>
+
+    <section class="screen" id="s-about">
+      <h2>ABOUT</h2>
+      <p>I build low-level systems — OS internals, memory, security tooling, the parts most people never see. I like problems where the constraints are real: fixed heaps, live databases, no room to leak.</p>
+      <p>Off the terminal: weightlifting, soccer, fantasy novels, and — clearly — retro games. This site is a game because building at the systems level has always felt like one to me.</p>
+      <div class="contact">
+        <div class="kv"><span class="k">Email</span><span class="v"><a href="mailto:rhyslestertalley@gmail.com">rhyslestertalley@gmail.com</a></span></div>
+        <div class="kv"><span class="k">LinkedIn</span><span class="v"><a href="#">/in/rhys-lester-talley</a> <span class="muted">— add your URL</span></span></div>
+        <div class="kv"><span class="k">Phone</span><span class="v">(510) 365-0307</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- dialogue -->
+  <div class="dialogue" id="dialogue">
+    <button class="back" id="back">◀ BACK</button>
+    <span id="dtext"></span>
+    <span class="tri">▼</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var menu = document.getElementById('menu');
+  var items = Array.prototype.slice.call(menu.querySelectorAll('li'));
+  var home = document.getElementById('home');
+  var dialogue = document.getElementById('dialogue');
+  var dtext = document.getElementById('dtext');
+  var back = document.getElementById('back');
+  var sel = 0, current = null;
+
+  var hints = {
+    resume:'RESUME — download the full PDF. No games.',
+    projects:'PROJECTS — proprietary systems work. Ask me to go deep in an interview.',
+    experience:'EXPERIENCE — IBM z/TPF, startup backend, teaching, research.',
+    education:'EDUCATION — Columbia, BS + MS, Magna Cum Laude.',
+    about:'ABOUT — who I am off the terminal.'
+  };
+
+  // typewriter
+  var tw;
+  function say(text){
+    clearInterval(tw);
+    if(reduce){ dtext.textContent = text; return; }
+    dtext.textContent=''; var i=0;
+    tw=setInterval(function(){
+      dtext.textContent += text.charAt(i++);
+      if(i>=text.length) clearInterval(tw);
+    }, 18);
+  }
+
+  function paint(){
+    items.forEach(function(li,i){ li.setAttribute('aria-selected', i===sel ? 'true':'false'); });
+  }
+
+  function boot(){
+    paint();
+    if(reduce){ say('Welcome. Use \u2191 \u2193 to move, ENTER to select.'); return; }
+    var lines=['booting rhysOS v2.6 ...','loading portfolio ...','ready.'], n=0;
+    (function next(){
+      if(n<lines.length){ say(lines[n++]); setTimeout(next, 720); }
+      else say('Welcome. Use \u2191 \u2193 to move, ENTER to select.');
+    })();
+  }
+
+  function open(target){
+    current = target;
+    home.style.display='none';
+    var scr=document.getElementById('s-'+target);
+    if(scr) scr.classList.add('active');
+    dialogue.classList.add('showback');
+    say(hints[target]||'');
+  }
+  function close(){
+    if(current){ var scr=document.getElementById('s-'+current); if(scr) scr.classList.remove('active'); }
+    current=null;
+    home.style.display='';
+    dialogue.classList.remove('showback');
+    say('Welcome. Use \u2191 \u2193 to move, ENTER to select.');
+    paint();
+  }
+
+  items.forEach(function(li,i){
+    li.addEventListener('click', function(){ sel=i; paint(); open(li.dataset.target); });
+    li.addEventListener('mouseenter', function(){ if(!current){ sel=i; paint(); } });
+  });
+  back.addEventListener('click', close);
+
+  document.addEventListener('keydown', function(e){
+    if(current){
+      if(e.key==='Escape'||e.key==='Backspace'){ e.preventDefault(); close(); }
+      return;
+    }
+    if(e.key==='ArrowDown'){ e.preventDefault(); sel=(sel+1)%items.length; paint(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); sel=(sel-1+items.length)%items.length; paint(); }
+    else if(e.key==='Enter'){ e.preventDefault(); open(items[sel].dataset.target); }
+  });
+
+  // clock
+  function tick(){
+    var d=new Date(), h=('0'+d.getHours()).slice(-2), m=('0'+d.getMinutes()).slice(-2);
+    document.getElementById('clock').textContent=h+':'+m;
+  }
+  tick(); setInterval(tick,15000);
+
+  boot();
+})();
+</script>
+</body>
+</html>
