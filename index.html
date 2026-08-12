@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rhys Lester-Talley — Systems Engineer</title>
+<title>Rhys Lester-Talley – Systems Engineer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
@@ -215,52 +215,60 @@ a:hover{color:var(--panel);border-color:var(--panel)}
     <!-- SCREENS -->
     <section class="screen" id="s-resume">
       <h2>RESUME</h2>
-      <p>One click, no games. The PDF is the fastest path to the full picture.</p>
+      <p>Want to learn more about me? Take a look at my resumé below!</p>
       <p><a class="btn" href="resume.pdf" download>▼ DOWNLOAD RESUME (PDF)</a></p>
-      <p class="muted">Replace <span class="green">resume.pdf</span> with your file, or point this at a hosted copy.</p>
-    </section>
+     </section>
 
     <section class="screen" id="s-projects">
       <h2>PROJECTS</h2>
-      <p class="muted">Both are proprietary IBM z/TPF systems work, so there's no public repo — but I can walk through the design, the tradeoffs, and the gnarly parts in an interview.</p>
+      <p class="muted">Both are proprietary IBM z/TPF systems work, so there's no public repo, but ask me more about either and I'd be happy to tell you about them!</p>
 
       <div class="card">
         <h3>Remote TLS Certificate Expiration Monitor</h3>
         <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">x86 ASM</span><span class="tag">z/TPF</span></div>
-        <div class="kv"><span class="k">Problem</span><span class="v">Large z/TPF clients — Visa, Amtrak, the IRS — had no way to track expiry of the remote TLS certs their systems handshake with. A silent expiration means an outage.</span></div>
-        <div class="kv"><span class="k">Built</span><span class="v">Compliance tooling that captures client/server certs after the TLS handshake into a hashmap in system heap. An operator command lists every stored cert with its expiry; a daily sweep flags anything inside a configurable window and hands it to a customizable user exit so each client wires in their own alerting.</span></div>
-        <div class="kv"><span class="k">Hard part</span><span class="v">Doing this inside a proprietary OS with tight heap constraints and zero tolerance for leaks — and designing the user-exit boundary so clients extend behavior without touching core code.</span></div>
+        <div class="kv"><span class="k">Problem</span><span class="v">Large z/TPF clients – Visa, Amtrak, the IRS – had no way to track expiry of the remote TLS certs their systems handshake with. A silent expiration that they can't control can cause an outage, costing them huge amounts of time and resources.</span></div>
+        <div class="kv"><span class="k">Built</span><span class="v">Compliance tooling that captures remote client/server TLS certificates after SSL handshake occurs. Certificates are parsed and placed into a hashmap in system heap. A console command lists every stored cert with its expiry; a daily sweep flags anything inside a configurable window and hands it to a customizable user exit so that each client can handle it as their business needs require – <span class="green">catching expirations before they turn into an outage</span>.</span></div>
+        <div class="kv"><span class="k">Hard part</span><span class="v">Doing this inside a proprietary OS with tight heap constraints and zero tolerance for leaks. Incorporating real time feedback from our clients to ensure the tooling will work for everyone regardless of their traffic volume.</span></div>
+        <div class="kv"><span class="k">Docs</span><span class="v"><a href="https://www.ibm.com/docs/en/ztpf/1.1.2026?topic=inventory-tls-certificate-expiration-monitoring" target="_blank" rel="noopener noreferrer">IBM z/TPF: TLS Certificate Expiration Monitoring</a></span></div>
       </div>
 
       <div class="card">
         <h3>Parallel I/O &amp; Compression Migration</h3>
         <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">TPFDF</span><span class="tag">CRUISE</span></div>
-        <div class="kv"><span class="k">Problem</span><span class="v">A hierarchical, record-oriented TPFDF database was slow to read at scale.</span></div>
-        <div class="kv"><span class="k">Built</span><span class="v">A migration routine converting it into an indexed, compressed structure — up to <span class="green">96% faster reads</span>. Reused existing CRUISE architecture and DF APIs to keep duplication down, plus a fallback path so a migration can roll back safely on live data.</span></div>
-        <div class="kv"><span class="k">Hard part</span><span class="v">Making migration safe and reversible against production data while proving the read-path win held up under real load.</span></div>
+        <div class="kv"><span class="k">Problem</span><span class="v">The hierarchical, record-oriented TPFDF database was slow to read at scale, with each record needing to be completely read from disk before the next could be accessed.</span></div>
+        <div class="kv"><span class="k">Built</span><span class="v">A migration routine converting user selected databases into an indexed and compressed structure–up to <span class="green">96% faster reads</span> for large databases. Reused existing CRUISE architecture and DF APIs to keep duplication down while also adding custom handling to ensure database integirty in the event of an error. Additionally shipped a full falback migration routine so clients have the option to revert back to the original structure if they choose.</span></div>
+        <div class="kv"><span class="k">Hard part</span><span class="v">Parsing complex HLASM routines to understand what integrity checks and assignments my custom routine will need to do to keep migrated databases compliant. Ensuring data integrity during migration while simultaneously ensuring the database resides at the same location on disk. Handling complex error processing so clients experience no downtime on their production databases in the event of an error.</span></div>
+      </div>
+
+      <div class="card">
+        <h3>HTTP/2 Proxy Support</h3>
+        <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">HTTP</span><span class="tag">TLS</span><span class="tag">z/TPF</span></div>
+        <div class="kv"><span class="k">Problem</span><span class="v">As part of a larger effort to bring HTTP/2 support to z/TPF, proxy connections needed to keep working through TLS proxy servers that only spoke HTTP/1.1 – infrastructure our clients still depended on and that had no way to parse HTTP/2 frames or streams.</span></div>
+        <div class="kv"><span class="k">Built</span><span class="v">Implemented HTTP/2 proxy support by routing all HTTP/2 proxy traffic through the same CONNECT – established TCP tunnel used by HTTP/1.1, so existing HTTP/1.1 proxy servers (and backwards-compatible HTTP/2 ones) could set up the tunnel without ever needing to understand HTTP/2 frames or streams. Added the logic to both the persistent and non-persistent connection routines, and supported synchronous and asynchronous messages, with <span class="green">zero regressions</span> for existing HTTP/1.1 proxy clients.</span></div>
+        <div class="kv"><span class="k">Hard part</span><span class="v">Realizing the CONNECT request method could stay entirely HTTP/1.1 regardless of which protocol version got negotiated afterward – that meant I could hook directly into the existing HTTP/1.1 TLS proxy routine instead of writing new tunnel – setup logic, but getting there took digging into both the HTTP/1.1 and HTTP/2 specs to confirm the CONNECT tunnel was truly protocol-agnostic.</span></div>
       </div>
     </section>
 
     <section class="screen" id="s-experience">
       <h2>EXPERIENCE</h2>
       <div class="card">
-        <h3>Software Developer Intern — IBM z/TPF</h3>
-        <p class="muted">Middleware &amp; Security · Database squad — Poughkeepsie, NY · 2025–present</p>
+        <h3>Software Developer Intern – IBM z/TPF</h3>
+        <p class="muted">Middleware &amp; Security · Database squad – Poughkeepsie, NY · 2025–present</p>
         <p>Built middleware TLS-cert monitoring, resolved a critical bug that hung shared system sockets, and worked directly with clients to scope and redesign features. <span class="green">Converted a full-time offer into a continued internship to pursue my MS.</span></p>
       </div>
       <div class="card">
-        <h3>Software Engineering Intern — Columbia Build Labs (AMLAH)</h3>
-        <p class="muted">Backend &amp; system design — New York, NY · 2024–2025</p>
+        <h3>Software Engineering Intern – Columbia Build Labs (AMLAH)</h3>
+        <p class="muted">Backend &amp; system design – New York, NY · 2024–2025</p>
         <p>Designed data models, database schemas, and RESTful APIs for scheduling remote real-estate tours, agent availability, and inventory.</p>
       </div>
       <div class="card">
-        <h3>Teaching Assistant — Columbia CS</h3>
-        <p class="muted">4 courses · 3 professors — 2024–present</p>
+        <h3>Teaching Assistant – Columbia CS</h3>
+        <p class="muted">4 courses · 3 professors – 2024–present</p>
         <p>TA for Advanced C, C++ Design, Data Structures, and Intro Java. Build grading rubrics in Pygrader, run office hours, and design exams, assignments, and projects.</p>
       </div>
       <div class="card">
-        <h3>Research Intern — DitecT Lab (WayCARE)</h3>
-        <p class="muted">Prof. Xuan Di — 2024</p>
+        <h3>Research Intern – DitecT Lab (WayCARE)</h3>
+        <p class="muted">Prof. Xuan Di – 2024</p>
         <p>Extended an existing codebase to deploy and update a full-stack weather-data dashboard.</p>
       </div>
     </section>
@@ -268,11 +276,11 @@ a:hover{color:var(--panel);border-color:var(--panel)}
     <section class="screen" id="s-education">
       <h2>EDUCATION</h2>
       <div class="card">
-        <h3>M.S. Computer Science — Software Systems</h3>
+        <h3>M.S. Computer Science – Software Systems</h3>
         <p class="muted">Columbia University · expected May 2027</p>
       </div>
       <div class="card">
-        <h3>B.S. Computer Science — Magna Cum Laude</h3>
+        <h3>B.S. Computer Science – Magna Cum Laude</h3>
         <p class="muted">Columbia University · May 2026 · GPA 4.08 / 4.00</p>
         <p><span class="green">Tau Beta Pi</span> · <span class="green">Upsilon Pi Epsilon</span></p>
       </div>
@@ -280,8 +288,8 @@ a:hover{color:var(--panel);border-color:var(--panel)}
 
     <section class="screen" id="s-about">
       <h2>ABOUT</h2>
-      <p>I build low-level systems — OS internals, memory, security tooling, the parts most people never see. I like problems where the constraints are real: fixed heaps, live databases, no room to leak.</p>
-      <p>Off the terminal: weightlifting, soccer, fantasy novels, and — clearly — retro games. This site is a game because building at the systems level has always felt like one to me.</p>
+      <p>I build low-level systems – OS internals, memory, security tooling, the parts most people never see. I like problems where the constraints are real: fixed heaps, live databases, no room to leak.</p>
+      <p>Off the terminal: weightlifting, soccer, fantasy novels, and – clearly – retro games. This site is a game because building at the systems level has always felt like one to me.</p>
       <div class="contact">
         <div class="kv"><span class="k">Email</span><span class="v"><a href="mailto:rhyslestertalley@gmail.com">rhyslestertalley@gmail.com</a></span></div>
         <div class="kv"><span class="k">LinkedIn</span><span class="v"><a href="https://www.linkedin.com/in/rhys-talley-b8277b207/" target="_blank" rel="noopener noreferrer">https://www.linkedin.com/in/rhys-talley-b8277b207/</a></span></div>
@@ -312,11 +320,11 @@ a:hover{color:var(--panel);border-color:var(--panel)}
   var sel = 0, current = null;
 
   var hints = {
-    resume:'RESUME — download the full PDF. No games.',
-    projects:'PROJECTS — proprietary systems work. Ask me to go deep in an interview.',
-    experience:'EXPERIENCE — IBM z/TPF, startup backend, teaching, research.',
-    education:'EDUCATION — Columbia, BS + MS, Magna Cum Laude.',
-    about:'ABOUT — who I am off the terminal.'
+    resume:'RESUME – download the full PDF. No games.',
+    projects:'PROJECTS – proprietary systems work. Ask me to go deep in an interview.',
+    experience:'EXPERIENCE – IBM z/TPF, startup backend, teaching, research.',
+    education:'EDUCATION – Columbia, BS + MS, Magna Cum Laude.',
+    about:'ABOUT – who I am off the terminal.'
   };
 
   // typewriter
