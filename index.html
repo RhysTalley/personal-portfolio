@@ -115,7 +115,7 @@ a:hover{color:var(--panel);border-color:var(--panel)}
 .card h3{margin:0 0 6px;font-size:26px;color:var(--panel);letter-spacing:.5px}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
 .tag{font-size:16px;color:var(--green);border:2px solid var(--line);padding:2px 8px;letter-spacing:.5px}
-.kv{display:flex;gap:8px;margin:3px 0}
+.kv{display:flex;gap:8px;margin:10px 0}
 .kv .k{color:var(--amber);flex:0 0 88px;font-size:19px;letter-spacing:.5px}
 .kv .v{color:var(--panel)}
 .btn{display:inline-flex;align-items:center;gap:10px;background:var(--green);color:var(--ink);
@@ -147,6 +147,8 @@ a:hover{color:var(--panel);border-color:var(--panel)}
   .menu{max-width:none}
   .menu li{font-size:23px}
   .status{font-size:16px}
+  .kv{flex-direction:column;gap:2px}
+  .kv .k{flex:none}
 }
 @media(prefers-reduced-motion:reduce){
   .cursor-blink,.dialogue .tri{animation:none}
