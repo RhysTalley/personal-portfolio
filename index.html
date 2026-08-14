@@ -176,7 +176,7 @@ a:hover{color:var(--panel);border-color:var(--panel)}
         <div class="role"><span class="prompt">&gt;</span> os &amp; systems software engineer</div>
         <ul class="menu" id="menu">
           <li data-target="resume"     tabindex="0"><span class="arrow">▶</span>RESUME<span class="hint">pdf</span></li>
-          <li data-target="projects"   tabindex="0"><span class="arrow">▶</span>PROJECTS<span class="hint">2</span></li>
+          <li data-target="projects"   tabindex="0"><span class="arrow">▶</span>PROJECTS<span class="hint">4</span></li>
           <li data-target="experience" tabindex="0"><span class="arrow">▶</span>EXPERIENCE</li>
           <li data-target="education"  tabindex="0"><span class="arrow">▶</span>EDUCATION</li>
           <li data-target="about"      tabindex="0"><span class="arrow">▶</span>ABOUT</li>
@@ -223,12 +223,12 @@ a:hover{color:var(--panel);border-color:var(--panel)}
 
     <section class="screen" id="s-projects">
       <h2>PROJECTS</h2>
-      <p class="muted">Both are proprietary IBM z/TPF systems work, so there's no public repo, but ask me more about either and I'd be happy to tell you about them!</p>
+      <p class="muted">Most are proprietary IBM z/TPF systems work, so there's no public repo, but ask me more about them and I'd be happy to tell you!</p>
 
       <div class="card">
         <h3>Remote TLS Certificate Expiration Monitor</h3>
         <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">x86 ASM</span><span class="tag">z/TPF</span></div>
-        <div class="kv"><span class="k">Problem</span><span class="v">Large z/TPF clients – Visa, Amtrak, the IRS – had no way to track expiry of the remote TLS certs their systems handshake with. A silent expiration that they can't control can cause an outage, costing them huge amounts of time and resources.</span></div>
+        <div class="kv"><span class="k">Problem</span><span class="v">Large z/TPF clients had no way to track expiry of the remote TLS certs their systems handshake with. A silent expiration that they can't control can cause an outage, costing them huge amounts of time and resources.</span></div>
         <div class="kv"><span class="k">Built</span><span class="v">Compliance tooling that captures remote client/server TLS certificates after SSL handshake occurs. Certificates are parsed and placed into a hashmap in system heap. A console command lists every stored cert with its expiry; a daily sweep flags anything inside a configurable window and hands it to a customizable user exit so that each client can handle it as their business needs require – <span class="green">catching expirations before they turn into an outage</span>.</span></div>
         <div class="kv"><span class="k">Hard part</span><span class="v">Doing this inside a proprietary OS with tight heap constraints and zero tolerance for leaks. Incorporating real time feedback from our clients to ensure the tooling will work for everyone regardless of their traffic volume.</span></div>
         <div class="kv"><span class="k">Docs</span><span class="v"><a href="https://www.ibm.com/docs/en/ztpf/1.1.2026?topic=inventory-tls-certificate-expiration-monitoring" target="_blank" rel="noopener noreferrer">IBM z/TPF: TLS Certificate Expiration Monitoring</a></span></div>
@@ -236,9 +236,9 @@ a:hover{color:var(--panel);border-color:var(--panel)}
 
       <div class="card">
         <h3>Parallel I/O &amp; Compression Migration</h3>
-        <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">TPFDF</span><span class="tag">CRUISE</span></div>
+        <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">TPFDF</span></div>
         <div class="kv"><span class="k">Problem</span><span class="v">The hierarchical, record-oriented TPFDF database was slow to read at scale, with each record needing to be completely read from disk before the next could be accessed.</span></div>
-        <div class="kv"><span class="k">Built</span><span class="v">A migration routine converting user selected databases into an indexed and compressed structure–up to <span class="green">96% faster reads</span> for large databases. Reused existing CRUISE architecture and DF APIs to keep duplication down while also adding custom handling to ensure database integirty in the event of an error. Additionally shipped a full falback migration routine so clients have the option to revert back to the original structure if they choose.</span></div>
+        <div class="kv"><span class="k">Built</span><span class="v">A migration routine converting user selected databases into an indexed and compressed structure–up to <span class="green">96% faster reads</span> for large databases. Reused existing DF APIs to keep duplication down while also adding custom handling to ensure database integirty in the event of an error. Additionally shipped a full falback migration routine so clients have the option to revert back to the original structure if they choose.</span></div>
         <div class="kv"><span class="k">Hard part</span><span class="v">Parsing complex HLASM routines to understand what integrity checks and assignments my custom routine will need to do to keep migrated databases compliant. Ensuring data integrity during migration while simultaneously ensuring the database resides at the same location on disk. Handling complex error processing so clients experience no downtime on their production databases in the event of an error.</span></div>
       </div>
 
@@ -248,6 +248,14 @@ a:hover{color:var(--panel);border-color:var(--panel)}
         <div class="kv"><span class="k">Problem</span><span class="v">As part of a larger effort to bring HTTP/2 support to z/TPF, proxy connections needed to keep working through TLS proxy servers that only spoke HTTP/1.1 – infrastructure our clients still depended on and that had no way to parse HTTP/2 frames or streams.</span></div>
         <div class="kv"><span class="k">Built</span><span class="v">Implemented HTTP/2 proxy support by routing all HTTP/2 proxy traffic through the same CONNECT – established TCP tunnel used by HTTP/1.1, so existing HTTP/1.1 proxy servers (and backwards-compatible HTTP/2 ones) could set up the tunnel without ever needing to understand HTTP/2 frames or streams. Added the logic to both the persistent and non-persistent connection routines, and supported synchronous and asynchronous messages, with <span class="green">zero regressions</span> for existing HTTP/1.1 proxy clients.</span></div>
         <div class="kv"><span class="k">Hard part</span><span class="v">Realizing the CONNECT request method could stay entirely HTTP/1.1 regardless of which protocol version got negotiated afterward – that meant I could hook directly into the existing HTTP/1.1 TLS proxy routine instead of writing new tunnel – setup logic, but getting there took digging into both the HTTP/1.1 and HTTP/2 specs to confirm the CONNECT tunnel was truly protocol-agnostic.</span></div>
+      </div>
+
+      <div class="card">
+        <h3>HTTP/2 Emergency Unlock for Socket Locks</h3>
+        <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">HLASM</span><span class="tag">z/TPF</span></div>
+        <div class="kv"><span class="k">Problem</span><span class="v">An ECB that acquires a lock on a shared socket item may take a catastrophic error while holding the lock and begin dump processing without releasing the lock. Thus, the socket item remains locked indefinitely, even though nothing is using it anymore.</span></div>
+        <div class="kv"><span class="k">Built</span><span class="v">Added a field to the ECB that saves the lockword at acquire time and is cleared when the lock is released. Then, a routine invoked during dump processing checks for the presence of that lockword and, if present, releases it before the dump completes – <span class="green">recovering the socket item automatically</span> instead of requiring a manual restart.</span></div>
+        <div class="kv"><span class="k">Hard part</span><span class="v">Locks can only be released on the I-stream that acquired them. I needed to spoof the saved lockword to make the lock appear acquired on the dumping I-stream to allow it to be released.</span></div>
       </div>
     </section>
 
