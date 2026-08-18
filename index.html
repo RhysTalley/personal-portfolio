@@ -176,7 +176,7 @@ a:hover{color:var(--panel);border-color:var(--panel)}
         <div class="role"><span class="prompt">&gt;</span> os &amp; systems software engineer</div>
         <ul class="menu" id="menu">
           <li data-target="resume"     tabindex="0"><span class="arrow">▶</span>RESUME<span class="hint">pdf</span></li>
-          <li data-target="projects"   tabindex="0"><span class="arrow">▶</span>PROJECTS<span class="hint">4</span></li>
+          <li data-target="projects"   tabindex="0"><span class="arrow">▶</span>PROJECTS<span class="hint">5</span></li>
           <li data-target="experience" tabindex="0"><span class="arrow">▶</span>EXPERIENCE</li>
           <li data-target="education"  tabindex="0"><span class="arrow">▶</span>EDUCATION</li>
           <li data-target="about"      tabindex="0"><span class="arrow">▶</span>ABOUT</li>
@@ -240,6 +240,14 @@ a:hover{color:var(--panel);border-color:var(--panel)}
         <div class="kv"><span class="k">Problem</span><span class="v">The hierarchical, record-oriented TPFDF database was slow to read at scale, with each record needing to be completely read from disk before the next could be accessed.</span></div>
         <div class="kv"><span class="k">Built</span><span class="v">A migration routine converting user selected databases into an indexed and compressed structure–up to <span class="green">96% faster reads</span> for large databases. Reused existing DF APIs to keep duplication down while also adding custom handling to ensure database integirty in the event of an error. Additionally shipped a full falback migration routine so clients have the option to revert back to the original structure if they choose.</span></div>
         <div class="kv"><span class="k">Hard part</span><span class="v">Parsing complex HLASM routines to understand what integrity checks and assignments my custom routine will need to do to keep migrated databases compliant. Ensuring data integrity during migration while simultaneously ensuring the database resides at the same location on disk. Handling complex error processing so clients experience no downtime on their production databases in the event of an error.</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Indeterminate-Size Test Driver Headers</h3>
+        <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">HTTP</span><span class="tag">z/TPF</span></div>
+        <div class="kv"><span class="k">Problem</span><span class="v">Our internal HTTP test drivers could only tack on 4 fixed headers – about 85 bytes total – onto a request or response. That's nowhere close to what's needed to stress-test real-world header loads or edge cases near protocol limits.</span></div>
+        <div class="kv"><span class="k">Built</span><span class="v">Replaced the fixed header list with size-based parameters that let a caller ask for request and response headers of (near) indeterminate size, up to just under a million bytes. The drivers now split that size into as many max-sized header chunks as needed on the way out, and reassemble and validate the exact byte count on the way back in – growing the effective header budget by <span class="green">well over 10,000x</span> the old fixed-header limit.</span></div>
+        <div class="kv"><span class="k">Hard part</span><span class="v">The underlying header API caps how big any single header can be, so honoring an arbitrary caller-requested size meant chunking it correctly, tracking how many chunks were needed, and reconstructing/validating the exact byte count on both the request and response side without an off-by-one on the final, partial chunk.</span></div>
       </div>
 
       <div class="card">
