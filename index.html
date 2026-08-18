@@ -243,11 +243,11 @@ a:hover{color:var(--panel);border-color:var(--panel)}
       </div>
 
       <div class="card">
-        <h3>Indeterminate-Size Test Driver Headers</h3>
+        <h3>Request and Response Headers for HTTP Test Driver</h3>
         <div class="tags"><span class="tag">C</span><span class="tag">C++</span><span class="tag">HTTP</span><span class="tag">z/TPF</span></div>
         <div class="kv"><span class="k">Problem</span><span class="v">Our internal HTTP test drivers could only tack on 4 fixed headers – about 85 bytes total – onto a request or response. That's nowhere close to what's needed to stress-test real-world header loads or edge cases near protocol limits.</span></div>
         <div class="kv"><span class="k">Built</span><span class="v">Replaced the fixed header list with size-based parameters that let a caller ask for request and response headers of (near) indeterminate size, up to just under a million bytes. The drivers now split that size into as many max-sized header chunks as needed on the way out, and reassemble and validate the exact byte count on the way back in – growing the effective header budget by <span class="green">well over 10,000x</span> the old fixed-header limit.</span></div>
-        <div class="kv"><span class="k">Hard part</span><span class="v">The underlying header API caps how big any single header can be, so honoring an arbitrary caller-requested size meant chunking it correctly, tracking how many chunks were needed, and reconstructing/validating the exact byte count on both the request and response side without an off-by-one on the final, partial chunk.</span></div>
+        <div class="kv"><span class="k">Hard part</span><span class="v">The underlying header API caps how big any single header can be, so honoring an arbitrary caller-requested size meant chunking it correctly, tracking how many chunks were needed, and reconstructing/validating the exact byte count on both the request and response side.</span></div>
       </div>
 
       <div class="card">
